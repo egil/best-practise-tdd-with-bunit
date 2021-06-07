@@ -1,0 +1,15 @@
+@inherits TestContext
+@* GridTest.razor *@
+@code {
+    [Fact]
+    public void Grid_Renders_Basic_Table_With_Head_And_Body()
+    {
+        var cut = Render(@<Grid TValue="object" />);
+
+        cut.MarkupMatches(
+            @<table>
+                <thead></thead>
+                <tbody></tbody>
+            </table>);
+    }
+}
