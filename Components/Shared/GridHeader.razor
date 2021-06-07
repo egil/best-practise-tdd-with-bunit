@@ -1,0 +1,19 @@
+@using System.Reflection
+@typeparam TItem
+@code
+{
+    private string[] columnNames = Array.Empty<string>();
+
+    protected override void OnInitialized()
+    {
+        columnNames = typeof(TItem).GetProperties(BindingFlags.Public | BindingFlags.Instance)
+            .Select(x => x.Name)
+            .ToArray();
+    }
+}
+<tr>
+    @foreach (var name in columnNames)
+    {
+        <th>@name</th>
+    }
+</tr>

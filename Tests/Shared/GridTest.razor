@@ -4,12 +4,32 @@
     [Fact]
     public void Grid_Renders_Basic_Table_With_Head_And_Body()
     {
-        var cut = Render(@<Grid TValue="object" />);
+        // Remove <GridHeader> from DOM tree, not important for this test.
+        // ComponentFactories.UseDummyFor<GridHeader>();
 
+        // Render the <Grid> component, TValue is unimportant for this test, so pick
+        var cut = Render(@<Grid TItem="object" />);
+
+        // Assert table with head and body
         cut.MarkupMatches(
             @<table>
-                <thead></thead>
+                <thead><tr diff:ignore></tr></thead>
                 <tbody></tbody>
             </table>);
+    }
+
+    [Fact]
+    public void Grid_Uses_GridHeader_To_Render_Table_Head()
+    {
+        // Render the <Grid> component, TValue is unimportant for this test, so pick
+        var cut = Render(@<Grid TItem="object" />);
+
+        // Find the <GridHeader> component in the render tree
+        // and assert that its content matches first row in thead.
+        var gridHeader = cut.FindComponent<GridHeader<object>>();
+        cut.Find("thead")
+            .ChildNodes
+            .MarkupMatches(gridHeader);
+    }
     }
 }
