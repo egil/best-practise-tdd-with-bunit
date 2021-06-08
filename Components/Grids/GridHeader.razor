@@ -3,6 +3,12 @@
 {
     private string[] columnNames = Array.Empty<string>();
 
+    [Parameter]
+    public bool EnableNew { get; set; }
+
+    [Parameter]
+    public EventCallback OnAddNewClicked { get; set; }
+
     protected override void OnInitialized()
     {
         columnNames = GridHelpers
@@ -12,6 +18,13 @@
     }
 }
 <tr>
+    @if(EnableNew)
+    {
+        <th>
+            <button class="addnew" @onclick="OnAddNewClicked">Add New</button>
+        </th>
+    }
+
     @foreach (var name in columnNames)
     {
         <th>@name</th>

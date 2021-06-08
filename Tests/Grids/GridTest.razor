@@ -44,4 +44,37 @@
             .Should()
             .BeEquivalentTo(items);
     }
+
+    [Fact]
+    public void When_EnableNew_Is_True_GridHeader_Show_Add_Command_Is_Set_To_True()
+    {
+        var cut = Render(@<Grid TItem="object" EnableNew="true" />);
+
+        cut.FindComponent<GridHeader<object>>()
+            .Instance
+            .EnableNew
+            .Should()
+            .BeTrue();
+    }
+ 
+    [Fact]
+    public void When_GridHeader_OnAddNewClicked_Empty_EditRow_Is_Rendered_In_Table_Body()
+    {
+        var cut = Render(@<Grid TItem="object" EnableNew="true" />);
+
+        // We can do either an event triggering through
+        // the DOM...
+        cut.Find("button.addnew").Click();
+        // or by invoking the OnAddNewClicked callback
+        // directly on the component. 
+        // cut.InvokeAsync(() => cut.FindComponent<GridHeader<object>>()
+        //     .Instance
+        //     .OnAddNewClicked
+        //     .InvokeAsync());
+
+        var editRow = cut.FindComponent<EditRow<object>>();
+        cut.Find("tbody")
+            .ChildNodes
+            .MarkupMatches(editRow);
+    }
 }

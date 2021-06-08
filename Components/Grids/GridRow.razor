@@ -2,12 +2,14 @@
 @code
 {
     [Parameter]
-    public TItem Item { get; set; }    
+    public TItem? Item { get; set; }
 
     private static Func<TItem, IEnumerable<(string Name, object? Value)>> GetItemData =
-        item => GridHelpers
-            .GetGridColumns<TItem>()
-            .Select(x => (x.Name, x.GetValue(item)));
+        item => item is null
+            ? Enumerable.Empty<(string Name, object? Value)>()
+            : GridHelpers
+                .GetGridColumns<TItem>()
+                .Select(x => (x.Name, x.GetValue(item)));
 }
 <tr>
     @foreach (var data in GetItemData(Item))

@@ -7,7 +7,7 @@
     {
         var cut = Render(@<GridHeader TItem="object" />);
         
-        cut.MarkupMatches("<tr />");
+        cut.MarkupMatches(@<tr></tr>);
     }
 
     [Fact]
@@ -23,4 +23,31 @@
                 <th>Summary</th>
             </tr>);
     }
+
+    [Fact]
+    public void When_EnableNew_Is_True_AddNew_Button_Is_Added_In_Command_Column()
+    {
+        var cut = Render(@<GridHeader TItem="object" EnableNew="true" />);
+        
+        cut.MarkupMatches(
+            @<tr>
+                <th>
+                    <button class="addnew">Add New</button>
+                </th>
+            </tr>);
+    }
+
+    [Fact]
+    public void Clicking_AddNew_Button_Raises_OnAddNewClicked()
+    {
+        var addNewClicked = false;
+
+        var cut = Render(@<GridHeader TItem="object" 
+                                      EnableNew="true"
+                                      OnAddNewClicked="() => addNewClicked = true" />);
+        
+        cut.Find("button.addnew").Click();
+
+        addNewClicked.Should().BeTrue();
+    }    
 }

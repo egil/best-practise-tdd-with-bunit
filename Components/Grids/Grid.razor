@@ -1,14 +1,26 @@
 @typeparam TItem
 @code
 {
+    private bool addNewMode = false;
+
     [Parameter] 
     public IEnumerable<TItem> Items { get; set; } = Enumerable.Empty<TItem>();
+
+    [Parameter]
+    public bool EnableNew { get; set; }    
 }
 <table>
     <thead>
-        <GridHeader TItem="TItem" />
+        <GridHeader TItem="TItem" 
+                    EnableNew="EnableNew"
+                    OnAddNewClicked="() => addNewMode = true" />
     </thead>
     <tbody>
+        @if(addNewMode)
+        {
+            <EditRow TItem="TItem" />
+        }
+
         @foreach (var item in Items)
         {
             <GridRow Item="item" />
