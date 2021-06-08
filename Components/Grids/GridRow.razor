@@ -1,0 +1,18 @@
+@using System.Reflection
+@typeparam TItem
+@code
+{
+    [Parameter]
+    public TItem Item { get; set; }    
+
+    private static Func<TItem, IEnumerable<object?>> GetItemData =
+        item => typeof(TItem).GetProperties(BindingFlags.Public | BindingFlags.Instance)
+            .Where(x => x.CanRead)
+            .Select(x => x.GetValue(item));
+}
+<tr>
+    @foreach (var data in GetItemData(Item))
+    {
+        <td>@data</td>
+    }
+</tr>

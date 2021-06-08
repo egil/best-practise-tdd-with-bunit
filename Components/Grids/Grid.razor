@@ -1,0 +1,17 @@
+@typeparam TItem
+@code
+{
+    [Parameter] 
+    public IEnumerable<TItem> Items { get; set; } = Enumerable.Empty<TItem>();
+}
+<table>
+    <thead>
+        <GridHeader TItem="TItem" />
+    </thead>
+    <tbody>
+        @foreach (var item in Items)
+        {
+            <GridRow Item="item" />
+        }
+    </tbody>
+</table>
