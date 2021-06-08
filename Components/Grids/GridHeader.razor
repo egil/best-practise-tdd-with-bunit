@@ -1,4 +1,3 @@
-@using System.Reflection
 @typeparam TItem
 @code
 {
@@ -6,8 +5,8 @@
 
     protected override void OnInitialized()
     {
-        columnNames = typeof(TItem).GetProperties(BindingFlags.Public | BindingFlags.Instance)
-            .Where(x => x.CanRead)
+        columnNames = GridHelpers
+            .GetGridColumns<TItem>()
             .Select(x => x.Name)
             .ToArray();
     }

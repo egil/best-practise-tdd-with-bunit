@@ -34,7 +34,8 @@
     }
 
     [Theory, AutoData]
-    public void Grid_Uses_GridRow_To_Render_Table_Row(IEnumerable<WeatherForecast> items)
+    public void Grid_Uses_GridRow_To_Render_Table_Row(
+        IEnumerable<WeatherForecast> items)
     {
         var cut = Render(@<Grid Items="items" />);
 
