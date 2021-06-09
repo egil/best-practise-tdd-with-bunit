@@ -5,9 +5,7 @@
     public TItem? Item { get; set; }
 
     private static Func<TItem, IEnumerable<(string Name, object? Value)>> GetItemData =
-        item => item is null
-            ? Enumerable.Empty<(string Name, object? Value)>()
-            : GridHelpers
+        item => GridHelpers
                 .GetGridColumns<TItem>()
                 .Select(x => (x.Name, x.GetValue(item)));
 }

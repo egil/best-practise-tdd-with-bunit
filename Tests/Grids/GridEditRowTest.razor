@@ -1,0 +1,26 @@
+@inherits TestContext
+@* GridTest.razor *@
+@code 
+{
+    [Fact]
+    public void GridEditRow_Renders_No_Columns_When_TItem_Has_No_Public_Properties()
+    {
+        var cut = Render(@<GridEditRow TItem="object" />);
+        
+        cut.MarkupMatches(@<tr><td diff:ignore></td></tr>);
+    }
+
+    [Fact]
+    public void GridEditRow_Renders_Columns_With_Input_FIelds_Based_On_Public_Settable_Instance_Properties_Of_TItem()
+    {
+        var cut = Render(@<GridEditRow TItem="WeatherForecast" />);
+
+        cut.MarkupMatches(
+            @<tr>
+                <td diff:ignore></td>
+                <td><input type="datetime" name="Date" value=@(default(DateTime)) /></td>
+                <td><input type="number" name="TemperatureC" value=@(default(int)) /></td>
+                <td><input type="text" name="Summary"/></td>
+            </tr>);
+    }
+}

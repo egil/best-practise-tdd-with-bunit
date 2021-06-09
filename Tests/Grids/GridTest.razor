@@ -65,6 +65,7 @@
         // We can do either an event triggering through
         // the DOM...
         cut.Find("button.addnew").Click();
+
         // or by invoking the OnAddNewClicked callback
         // directly on the component. 
         // cut.InvokeAsync(() => cut.FindComponent<GridHeader<object>>()
@@ -72,7 +73,7 @@
         //     .OnAddNewClicked
         //     .InvokeAsync());
 
-        var editRow = cut.FindComponent<EditRow<object>>();
+        var editRow = cut.FindComponent<GridEditRow<object>>();
         cut.Find("tbody")
             .ChildNodes
             .MarkupMatches(editRow);

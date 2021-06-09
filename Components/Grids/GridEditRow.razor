@@ -1,0 +1,51 @@
+@typeparam TItem 
+@code
+{
+    private TItem item;
+
+    protected override void OnInitialized()
+    {
+        item = item ?? Activator.CreateInstance<TItem>();        
+    }
+
+    private static Func<TItem, IEnumerable<(string Name, object? Value, Action<object?> Setter)>> GetItemData =
+        item => GridHelpers
+                .GetGridColumns<TItem>()
+                .Where(x => x.CanWrite)
+                .Select(x => 
+                    (
+                        x.Name, 
+                        x.GetValue(item), 
+                        (Action<object?>)(val => x.SetValue(item, val))
+                    )
+                );
+}
+<tr>    
+    <td></td>
+    @foreach (var field in GetItemData(item))
+    {
+        <td>
+            @if(field.Value is DateTime)
+            {
+                <input type="datetime" 
+                       name=@field.Name 
+                       value=@field.Value 
+                       @oninput=@(val => field.Setter(DateTime.Parse(val.ToString()))) />
+            }
+            else if(field.Value is int)
+            {
+                <input type="number" 
+                       name=@field.Name 
+                       value=@field.Value 
+                       @oninput=@(val => field.Setter(int.Parse(val.ToString()))) />
+            }
+            else
+            {
+                <input type="text" 
+                       name=@field.Name
+                       value=@field.Value 
+                       @oninput=@(val => field.Setter(val.ToString())) />
+            }
+        </td>
+    }
+</tr>
