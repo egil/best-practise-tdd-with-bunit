@@ -1,0 +1,16 @@
+@typeparam TItem
+@code
+{
+    [Parameter]
+    public TItem? Item { get; set; }
+
+    private IEnumerable<object?> GetItemData(TItem item)
+        => DataTableHelpers.GetItemsPropertyInfo<TItem>()
+            .Select(x => x.GetValue(item));
+}
+<tr>
+    @foreach (var columnData in GetItemData(Item))
+    {
+        <td>@columnData</td>
+    }
+</tr>

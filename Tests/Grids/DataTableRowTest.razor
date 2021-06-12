@@ -1,0 +1,27 @@
+@* DataTableRowTest.razor *@
+@inherits TestContext
+@code 
+{
+    [Fact]
+    public void DataTableRow_Renders_No_Columns_When_TItem_Has_No_Public_Properties()
+    {
+        var cut = Render(@<DataTableRow TItem="object" />);
+        
+        cut.MarkupMatches("<tr />");
+    }
+ 
+    [Theory, AutoData]
+    public void DataTableRow_Renders_Columns_Based_On_Public_Instance_Properties_Of_TItem(
+        WeatherForecast item)
+    {
+        var cut = Render(@<DataTableRow Item="item" />);
+
+        cut.MarkupMatches(
+            @<tr>
+                <td>@item.Date</td>
+                <td>@item.TemperatureC</td>
+                <td>@item.TemperatureF</td>
+                <td>@item.Summary</td>
+            </tr>);
+    }
+}

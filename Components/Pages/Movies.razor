@@ -1,0 +1,11 @@
+@using Components.Grids
+@page "/movies"
+@code 
+{
+    private IEnumerable<Movie> movies = new []
+    {
+        new Movie { Id = 1, Title = "Blazor", ReleaseDate = new DateTime(2019, 2, 23) },
+        new Movie { Id = 2, Title = "bUnit", ReleaseDate = new DateTime(2021, 3, 24) },
+    };
+}
+<DataTable Items="movies" />

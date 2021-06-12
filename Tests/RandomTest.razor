@@ -1,0 +1,15 @@
+@inherits TestContext
+@code
+{
+[Fact]
+public void Semanticcally_Verify_Markup_From_Rendered_Component_With_MarkupMatches()
+{
+  var cut = Render(@<div class="dialog-buttons">
+                      <button id="order" class="btn btn-confirm">Order</button>
+                    </div>);
+
+  cut.MarkupMatches(@<div class="dialog-buttons">
+                       <button id="order" class="btn btn-confirm">Order</button>
+                     </div>);
+}
+}
