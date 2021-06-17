@@ -1,0 +1,79 @@
+﻿@inherits TestContext
+@code
+{
+	private ICustomerRepository mockRepo;
+
+	public NewCustomerFormTestWithMock()
+	{
+		// Create and register mock repository
+		mockRepo = Substitute.For<ICustomerRepository>();
+		Services.AddSingleton(mockRepo);
+	}
+
+	[Theory, AutoData]
+	public void Submitting_Form_Creates_Customer_In_Repository(
+		string name, string email, int age)
+	{
+		// Render the component
+		var cut = Render(@<NewCustomerForm />);
+
+		// Fill form in component
+		SubmitForm(cut, name, email, age);
+
+		// Verify that the a customer with expected data was passed to the repository
+		mockRepo.Received(1).Add(new Customer
+		{
+			Name = name,
+			Email = email,
+			Age = age
+		});
+	}
+
+	[Theory, AutoData]
+	public void Submitting_Form_Creates_Navigates_To_Created_Customer_Page(
+		string name, string email, int age, int expectedCustomerId)
+	{
+		// Configure mock repository
+		mockRepo.Add(Arg.Any<Customer>()).Returns(expectedCustomerId);
+
+		// Render the component
+		var cut = Render(@<NewCustomerForm />);
+
+		// Fill form in component
+		SubmitForm(cut, name, email, age);
+
+		// Verify that the component navigated to the right sub page
+		Services.GetService<NavigationManager>()
+			.Uri
+			.Should()
+			.EndWith($"customers/{expectedCustomerId}");
+	}
+
+	[Theory, AutoData]
+	public void Submitting_From_Existing_Customer_Shows_Error_Message(
+		Customer existingCustomer)
+	{
+		// Configure mock repository
+		mockRepo.GetAll().Returns(new[] { existingCustomer });
+		
+		// Render the component
+		var cut = Render(@<NewCustomerForm />);
+
+		// Fill form in component
+		SubmitForm(cut, existingCustomer.Name, existingCustomer.Email, existingCustomer.Age);
+
+		// Verify that an error message is displayed
+		cut.FindAll(".error-msg")
+			.Should()
+			.NotBeEmpty();
+	}
+
+	private static void SubmitForm(IRenderedFragment cut, string name, string email, int age)
+	{
+		// Fill form in component
+		cut.Find("input[name=name]").Change(name);
+		cut.Find("input[name=email]").Change(email);
+		cut.Find("input[name=age]").Change(age.ToString());
+		cut.Find("button").Click();		
+	}
+}

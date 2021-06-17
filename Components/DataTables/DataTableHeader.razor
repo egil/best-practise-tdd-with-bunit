@@ -1,0 +1,44 @@
+@typeparam TItem
+@code
+{
+    [Parameter] 
+    public (string ColumnName, bool Ascending) SortBy { get; set; } = default;
+    
+    [Parameter] 
+    public EventCallback<(string ColumnName, bool Ascending)> SortByChanged { get; set; }
+
+    private string GetSortCssClass(string column)
+    {
+        var result = "sortable";
+
+        if(column == SortBy.ColumnName)
+        {
+            result += SortBy.Ascending 
+                ? " sorted-by"
+                : " sorted-by-desc";
+        }
+
+        return result;
+    }
+
+    private Task ChangeSortTo(string column)
+    {
+        var newSortBy = SortBy.ColumnName == column
+            ? (column, !SortBy.Ascending)
+            : (column, true);
+        return SortByChanged.InvokeAsync(newSortBy);
+    }    
+        
+    private IEnumerable<string> GetColumnNames()
+        => DataTableHelpers.GetItemsPropertyInfo<TItem>()
+            .Select(x => x.Name);
+}
+<tr>
+    @foreach (var name in GetColumnNames())
+    {
+        <th>
+            <a class=@GetSortCssClass(name) 
+               @onclick=@(_ => ChangeSortTo(name))>@name</a>
+        </th>
+    }
+</tr>

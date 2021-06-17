@@ -1,0 +1,103 @@
+@* DataTableTest.razor *@
+@inherits TestContext
+@code 
+{
+    [Fact]
+    public void DataTable_Renders_Basic_Table_With_Head_And_Body()
+    {
+        // NOTE: Preview feature.
+        ComponentFactories.UseDummyFor<DataTableHeader<object>>();
+
+        // Render the <DataTable> component, TValue is unimportant for this test, so pick
+        var cut = Render(@<DataTable TItem="object" />);
+
+        // Assert table with head and body
+        cut.MarkupMatches(
+            @<table>
+                <thead></thead>
+                <tbody></tbody>
+            </table>);
+    }
+
+    [Fact]
+    public void DataTable_Uses_DataTableHeader_To_Render_Table_Head()
+    {
+        // Render the <DataTable> component, TValue is unimportant for this test, so pick
+        var cut = Render(@<DataTable TItem="object" />);
+
+        // Find the <DataTableHeader> component in the render tree
+        // and assert that its content matches first row in thead.
+        var dataTableHeader = cut.FindComponent<DataTableHeader<object>>();
+        cut.Find("thead")
+            .ChildNodes
+            .MarkupMatches(dataTableHeader);
+    }
+
+    [Theory, AutoData]
+    public void DataTable_Uses_DataTableRow_To_Render_Table_Row(
+        IEnumerable<WeatherForecast> items)
+    {
+        // Render the <DataTable> component, passing it the weather forecasts
+        var cut = Render(@<DataTable Items="items" />);
+
+        // Find all DataTableRow components in the render tree
+        // and assert they were passed the correct item        
+        cut.FindItemsAssignedToRows<WeatherForecast>()
+            .Should()
+            .BeEquivalentTo(items);
+    }
+
+    [Theory, AutoData]
+    public void DataTable_Sorts_By_First_Column_By_Default(
+        IEnumerable<WeatherForecast> items)
+    {
+        // Render the <DataTable> component, passing it the weather forecasts
+        var cut = Render(@<DataTable Items="items" />);
+
+        // Find all DataTableRow components in the render tree
+        // and assert they were sorted correctly.
+        cut.FindItemsAssignedToRows<WeatherForecast>()
+            .Should()
+            .BeInAscendingOrder(x => x.Date);
+    }
+ 
+    [Theory, AutoData]
+    public void DataTable_Clicking_Header_Column_Sorts_Items_By_Column(
+        IEnumerable<WeatherForecast> items)
+    {
+        // Render the <DataTable> component, passing it the weather forecasts
+        var cut = Render(@<DataTable Items="items" />);
+
+        // Find and click the TemperatureC column to sort by it
+        cut.FindAll("thead a")
+            .Single(x => x.TextContent == nameof(WeatherForecast.TemperatureC))
+            .Click();
+    
+        // Find all DataTableRow components in the render tree
+        // and assert they were sorted by TemperatureC
+        cut.FindItemsAssignedToRows<WeatherForecast>()
+            .Should()
+            .BeInAscendingOrder(x => x.TemperatureC);
+    }
+
+    [Theory, AutoData]
+    public void DataTable_Clicking_Header_Column_Sorts_Items_By_Column_2(
+        IEnumerable<WeatherForecast> items)
+    {
+        // Render the <DataTable> component, passing it the weather forecasts
+        var cut = Render(@<DataTable Items="items" />);
+
+        // Invoke the SortByChanged event callback directly
+        cut.InvokeAsync(() =>
+            cut.FindComponent<DataTableHeader<WeatherForecast>>()
+                .Instance
+                .SortByChanged
+                .InvokeAsync(("TemperatureC", true)));
+    
+        // Find all DataTableRow components in the render tree
+        // and assert they were sorted by TemperatureC
+        cut.FindItemsAssignedToRows<WeatherForecast>()
+            .Should()
+            .BeInAscendingOrder(x => x.TemperatureC);
+    }
+}

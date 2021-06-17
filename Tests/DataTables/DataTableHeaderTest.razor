@@ -1,0 +1,75 @@
+@* DataTableRowTest.razor *@
+@inherits TestContext
+@code 
+{
+    [Fact]
+    public void DataTableHeader_Renders_No_Columns_When_TItem_Has_No_Public_Properties()
+    {
+        var cut = Render(@<DataTableHeader TItem="object" />);
+        
+        cut.MarkupMatches("<tr />");
+    }
+ 
+    [Fact]
+    public void DataTableHeader_Renders_Columns_Based_On_Public_Instance_Properties_Of_TItem()
+    {
+        var cut = Render(@<DataTableHeader TItem="WeatherForecast" />);
+
+        cut.MarkupMatches(
+            @<tr>
+                <th><a class="sortable">Date</a></th>
+                <th><a class="sortable">TemperatureC</a></th>
+                <th><a class="sortable">TemperatureF</a></th>
+                <th><a class="sortable">Summary</a></th>
+            </tr>);
+    }
+
+    [Theory]
+    [InlineData(".sorted-by", true)]
+    [InlineData(".sorted-by-desc", false)]
+    public void DataTableHeader_Adds_Sort_Css_Class_To_Sorted_Column(string expectedCssClass, bool isAscendingSort)
+    {
+        // Render DataTableHeader with sortBy set to last column
+        var cut = Render(@<DataTableHeader TItem="WeatherForecast" 
+                                           SortBy=@(("Summary", isAscendingSort)) />); 
+        
+        // Verify the correct column has the expected css class added
+        cut.FindAll(expectedCssClass)
+            .Should()
+            .ContainSingle()
+            .Which
+            .TextContent
+            .Should()
+            .Be("Summary");
+    }
+
+    [Fact]
+    public void DataTableHeader_Clicking_Column_Raises_SortByChanged_With_ColumnName_Set_To_Clicked_Column()
+    {
+        // Set initial sortBy value to last column and render DataTableHeader with sortBy bound
+        var sortBy = (ColumnName: "Summary", Ascending: true);
+        var cut = Render(@<DataTableHeader TItem="WeatherForecast" @bind-SortBy="sortBy" />);
+
+        // Click the first column (Date) in the table
+        var column = cut.FindAll("th > a").First();
+        column.Click();
+
+        // Assert sortBy column name is changed 
+        sortBy.ColumnName.Should().Be("Date");
+    }
+
+    [Fact]
+    public void DataTableHeader_Clicking_Current_Sorted_By_Column_Raises_SortByChanged_With_Ascending_Inverted()
+    {
+        // Set initial sortBy value to last column and render DataTableHeader with sortBy bound
+        var sortBy = (ColumnName: "Summary", Ascending: true);
+        var cut = Render(@<DataTableHeader TItem="WeatherForecast" @bind-SortBy="sortBy" />);
+
+        // Click the last column (Summary) in the table
+        var column = cut.FindAll("th > a").Last();
+        column.Click();
+
+        // Assert sortBy column name is changed 
+        sortBy.Ascending.Should().BeFalse();
+    }
+}

@@ -1,0 +1,15 @@
+@* IndexTest.razor *@
+@inherits TestContext
+@code
+{
+    [Fact]
+    public void TestName()
+    {
+        //Given
+        var cut = Render(@<Index />);
+        //When
+        cut.Find("input").Change("foo");
+        //Then
+        cut.Find("input").MarkupMatches(@<input type="text" value="foo" />);
+    }
+}

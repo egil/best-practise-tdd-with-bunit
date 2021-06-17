@@ -1,0 +1,29 @@
+@typeparam TItem
+@code
+{
+    private (string ColumnName, bool Ascending) sortBy;
+
+    protected override void OnInitialized()
+    {
+        var initialSortByColumn = 
+            DataTableHelpers.GetItemsPropertyInfo<TItem>()
+                .Select(x => x.Name)
+                .FirstOrDefault(string.Empty);
+
+        sortBy = (ColumnName: initialSortByColumn, Ascending: true);
+    }
+
+    [Parameter]
+    public IEnumerable<TItem> Items { get; set; } = Enumerable.Empty<TItem>();            
+}
+<table>
+    <thead>
+        <DataTableHeader TItem="TItem" @bind-SortBy="sortBy" />
+    </thead>
+    <tbody>
+        @foreach (var item in Items.SortBy(sortBy))
+        {
+            <DataTableRow Item="item" />
+        }
+    </tbody>
+</table>

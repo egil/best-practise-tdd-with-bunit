@@ -1,0 +1,37 @@
+﻿@inject ICustomerRepository Repo
+@inject NavigationManager NavMan
+@code
+{
+	string name;
+	string email;
+	int age;
+	bool showErrorMsg;
+
+	private void AddCustomer()
+	{
+		if (Repo.GetAll().Any(x => x.Email == email))
+		{
+			showErrorMsg = true;
+		}
+		else
+		{
+			showErrorMsg = false;
+			var customerId = Repo.Add(new Customer
+			{
+				Name = name,
+				Email = email,
+				Age = age
+			});
+
+			NavMan.NavigateTo($"customers/{customerId}");
+		}
+	}
+}
+<input type="text" name="name" placeholder="Name" @bind-value="name" />
+<input type="email" name="email" placeholder="Email" @bind-value="email" />
+<input type="number" name="age" placeholder="Age" @bind-value="age" />
+<button @onclick="AddCustomer">Add customer</button>
+@if (showErrorMsg)
+{
+	<p class="error-msg">Customer already exists</p>
+}
