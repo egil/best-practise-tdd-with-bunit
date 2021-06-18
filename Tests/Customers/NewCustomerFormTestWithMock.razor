@@ -68,6 +68,25 @@
 			.NotBeEmpty();
 	}
 
+	[Theory, AutoData]
+	public void When_Repo_Throws_Error_Message_Is_Shown(
+		string name, string email, int age)
+	{
+		// Configure mock repository
+		mockRepo.Add(Arg.Any<Customer>()).Returns(x => { throw new TimeoutException(); });
+
+		// Render the component
+		var cut = Render(@<NewCustomerForm />);
+
+		// Fill form in component
+		SubmitForm(cut, name, email, age);
+
+		// Verify that an error message is displayed
+		cut.FindAll(".error-msg")
+			.Should()
+			.NotBeEmpty();
+	}
+
 	private static void SubmitForm(IRenderedFragment cut, string name, string email, int age)
 	{
 		// Fill form in component

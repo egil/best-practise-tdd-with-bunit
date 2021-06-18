@@ -12,18 +12,24 @@
 		if (Repo.GetAll().Any(x => x.Email == email))
 		{
 			showErrorMsg = true;
+			return;
 		}
-		else
+		
+		showErrorMsg = false;
+
+		try
 		{
-			showErrorMsg = false;
 			var customerId = Repo.Add(new Customer
 			{
 				Name = name,
 				Email = email,
 				Age = age
 			});
-
 			NavMan.NavigateTo($"customers/{customerId}");
+		}
+		catch
+		{
+			showErrorMsg = true;
 		}
 	}
 }
@@ -31,7 +37,8 @@
 <input type="email" name="email" placeholder="Email" @bind-value="email" />
 <input type="number" name="age" placeholder="Age" @bind-value="age" />
 <button @onclick="AddCustomer">Add customer</button>
+
 @if (showErrorMsg)
 {
-	<p class="error-msg">Customer already exists</p>
+	<p class="error-msg">Customer already exists or something went wrong!</p>
 }
