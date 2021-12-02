@@ -14,9 +14,12 @@
     }
 
     [Parameter]
-    public IEnumerable<TItem> Items { get; set; } = Enumerable.Empty<TItem>();            
+    public IEnumerable<TItem> Items { get; set; } = Enumerable.Empty<TItem>();  
+    
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? Attributes { get; set; }
 }
-<table>
+<table @attributes="Attributes">
     <thead>
         <DataTableHeader TItem="TItem" @bind-SortBy="sortBy" />
     </thead>

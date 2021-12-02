@@ -6,7 +6,7 @@
     public void DataTable_Renders_Basic_Table_With_Head_And_Body()
     {
         // NOTE: Preview feature.
-        ComponentFactories.UseDummyFor<DataTableHeader<object>>();
+        ComponentFactories.AddStub<DataTableHeader<object>>();
 
         // Render the <DataTable> component, TValue is unimportant for this test, so pick
         var cut = Render(@<DataTable TItem="object" />);
@@ -17,6 +17,32 @@
                 <thead></thead>
                 <tbody></tbody>
             </table>);
+    }
+
+    [Fact]
+    public void DataTable_Renders_Basic_Table_With_Head_And_Body_With_Dummy_Head()
+    {
+        ComponentFactories.Add<DataTableHeader<object>, DummyHeader>();
+
+        // Render the <DataTable> component, TValue is unimportant for this test, so pick
+        var cut = Render(@<DataTable TItem="object" />);
+
+        // Assert table with head and body
+        cut.MarkupMatches(
+            @<table>
+                <thead></thead>
+                <tbody></tbody>
+            </table>);
+    }
+
+    class DummyHeader : ComponentBase
+    {
+        [Parameter] 
+        public (string ColumnName, bool Ascending) SortBy { get; set; } = default;
+    
+        [Parameter] 
+        public EventCallback<(string ColumnName, bool Ascending)> SortByChanged { get; set; }
+
     }
 
     [Fact]

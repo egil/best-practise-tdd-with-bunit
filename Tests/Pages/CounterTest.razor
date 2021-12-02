@@ -1,17 +1,24 @@
-@* Counter.razor *@
+@* DialogButtons.razor *@
+<div class="dialog-buttons">
+  <button id="order" class="btn btn-confirm">Order</button>
+</div>
+
+@* CounterTest.razor *@
 @code {
     [Fact]
     public void Counter_Should_Increment_When_Clicked()
     {
         // Arrange: Render the Counter.razor component
         using var ctx = new TestContext();
-        var cut = ctx.Render(@<Counter/>);
+        IRenderedFragment cut = ctx.Render(@<Counter/>);
 
         // Act: Find and click the <button> element to increment
         // the counter in the <p> element
-        cut.Find("button").Click();
+        IElement button = cut.Find("button");
+        button.Click();
 
         // Assert: First find the <p> element, then verify its content
-        cut.Find("p").MarkupMatches(@<p>Current count: 1</p>);
+        IElement paragraph = cut.Find("p");
+        paragraph.MarkupMatches(@<p>Current count: 1</p>);
     }
 }

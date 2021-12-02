@@ -1,11 +1,10 @@
 using System;
 
-namespace Components
+namespace Components;
+
+public class Movie
 {
-    public class Movie
-    {
-        public int Id { get; set; }
-        public string Title { get; set; }
-        public DateTime ReleaseDate { get; set; }
-    }
+    public int Id { get; set; }
+    public string Title { get; set; }
+    public DateTime ReleaseDate { get; set; }
 }

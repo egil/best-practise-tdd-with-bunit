@@ -1,0 +1,119 @@
+@inherits TestContext
+@using Moq
+@code 
+{
+    [Fact]
+    public void Foo_Doesnt_Have_A_Bar()
+    {
+        // Register the component factory
+        ComponentFactories.Add(new BarSubstituteComponentFactory());
+
+        // Render the component under test
+        IRenderedFragment cut = Render(@<Foo />);
+
+        // Verify that the Bar component has 
+        // been substituted in the render tree
+        cut.HasComponent<Bar>().Should().BeFalse();
+        cut.HasComponent<BarSubstitute>().Should().BeTrue();
+    }
+
+    [Fact]
+    public void Foo_Doesnt_Have_A_Bar_But_Stub()
+    {
+        // Register the component factory       
+        ComponentFactories.AddStub<Bar>();
+        // Render the component under test
+        IRenderedFragment cut = Render(@<Foo />);
+
+        // Verify that the Bar component has 
+        // been substituted in the render tree
+        cut.HasComponent<Bar>().Should().BeFalse();
+        cut.HasComponent<Stub<Bar>>().Should().BeTrue();
+    }
+
+    [Fact]
+    public void Foo_Doesnt_Have_A_Bar_But_Stub2()
+    {
+        // Register the component factory    
+        ComponentFactories.AddStub<Bar>(ps => @<h1>NOT BAR</h1>);
+        
+        // Render the component under test
+        IRenderedFragment cut = Render(@<Foo />);
+
+        // Verify that the Bar component has 
+        // been substituted in the render tree
+        cut.HasComponent<Bar>().Should().BeFalse();
+        cut.HasComponent<Stub<Bar>>().Should().BeTrue();
+        cut.MarkupMatches(@<h1>NOT BAR</h1>);
+    }
+
+    [Fact]
+    public void Foo_Doesnt_Have_A_Bar_But_Stub3()
+    {
+        // Register the component factory    
+        ComponentFactories.AddStub(type => type.Namespace.StartsWith("ThridPartyLib"));
+        ComponentFactories.AddStub(type => type != typeof(Foo));
+
+        // Render the component under test
+        IRenderedFragment cut = Render(@<Foo />);
+
+        // Verify that the Bar component has 
+        // been substituted in the render tree
+        cut.HasComponent<Bar>().Should().BeFalse();
+        cut.HasComponent<Stub<Bar>>().Should().BeTrue();
+    }
+
+    [Fact]
+    public void Foo_Doesnt_Have_A_Bar_But_Mock()
+    {
+        // Register the component factory    
+        Mock<Bar> barMock = new Mock<Bar>();
+        ComponentFactories.Add<Bar>(barMock.Object);
+
+        // Render the component under test
+        IRenderedFragment cut = Render(@<Foo />);
+
+        // Verify that the Bar component has 
+        // been substituted in the render tree
+        IRenderedComponent<Bar> bar = cut.FindComponent<Bar>();
+        
+        bar.Instance.Should().BeSameAs(barMock.Object);
+    }
+
+    [Fact]
+    public void Foo_Doesnt_Have_A_Bar_But_Mock2()
+    {
+        // Register the component factory    
+        MockRepository mockRepository = new MockRepository(MockBehavior.Loose);
+        ComponentFactories.Add<Bar>(() => mockRepository.Create<Bar>().Object);
+
+        // Render the component under test
+        IRenderedFragment cut = Render(@<Foo />);
+
+        // Verify that the Bar component has 
+        // been substituted in the render tree
+        IReadOnlyList<IRenderedComponent<Bar>> bars 
+            = cut.FindComponents<Bar>();
+        
+        Mock<Bar> bar1Mock = Mock.Get(bars[0].Instance);
+        Mock<Bar> bar2Mock = Mock.Get(bars[1].Instance);
+    }
+
+    [Fact]
+    public void FooWithChild_Doesnt_Have_A_Bar_But_Mock()
+    {
+        using var ctx = new TestContext();
+        // Register the component factory    
+        Mock<ThrowingAllPlaces> fooComplexMock = new Mock<ThrowingAllPlaces>();
+        ctx.ComponentFactories.Add(fooComplexMock.Object);
+
+        // Render the component under test
+        IRenderedFragment cut = ctx.Render(@<FooWithChild><ThrowingAllPlaces /></FooWithChild>);
+
+        // Verify that the Bar component has 
+        // been substituted in the render tree
+        IRenderedComponent<ThrowingAllPlaces> barRc = cut.FindComponent<ThrowingAllPlaces>();
+        
+        barRc.Instance.Should().BeSameAs(fooComplexMock.Object);
+    }
+}

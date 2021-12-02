@@ -1,0 +1,10 @@
+@implements IDisposable
+@code {
+    //public int MyProperty { get; set; } = ThrowInitializer();
+
+    //public ThrowingAllPlaces() => throw new ArgumentException(nameof(ThrowingAllPlaces));    
+
+    public void Dispose() => throw new ArgumentException(nameof(Dispose));
+
+    static int ThrowInitializer() => throw new ArgumentException(nameof(ThrowInitializer));
+}
