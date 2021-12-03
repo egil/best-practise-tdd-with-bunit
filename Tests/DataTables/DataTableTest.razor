@@ -4,17 +4,14 @@
 {
     [Fact]
     public void DataTable_Renders_Basic_Table_With_Head_And_Body()
-    {
-        // NOTE: Preview feature.
-        ComponentFactories.AddStub<DataTableHeader<object>>();
-
+    {        
         // Render the <DataTable> component, TValue is unimportant for this test, so pick
         var cut = Render(@<DataTable TItem="object" />);
 
         // Assert table with head and body
         cut.MarkupMatches(
             @<table>
-                <thead></thead>
+                <thead diff:ignoreChildren></thead>
                 <tbody></tbody>
             </table>);
     }
